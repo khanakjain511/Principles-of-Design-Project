@@ -38,8 +38,7 @@ export default async function DashboardPage() {
 
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4 text-xs text-ink-subtle">
-          <span>Campus Rides · For coordination only</span>
-          <span>No payments. No bookings. Just a notice board.</span>
+          <span>Smart Ride Connect · Coordination with you fellow learners</span>
         </div>
       </footer>
     </div>
