@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { User, GENDER_VALUES, type Gender } from "@/models/User";
+import { Ride } from "@/models/Ride";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,11 @@ export async function PATCH(req: Request) {
     if (!updated) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    await Ride.updateMany(
+      { createdBy: session.user.id },
+      { $set: { creatorGender: gender } }
+    );
 
     return NextResponse.json({
       user: {

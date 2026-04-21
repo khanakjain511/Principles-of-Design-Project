@@ -78,7 +78,17 @@ export default function RideCard({ ride, currentUserId, onUpdated }: Props) {
             {formatRideDate(ride.date)} · {ride.timeWindow}
           </p>
         </div>
-        <StatusBadge status={status} />
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <StatusBadge status={status} />
+          {ride.creatorGender ? (
+            <span
+              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${GENDER_BADGE_CLASS[ride.creatorGender]}`}
+              title={`Posted by a ${GENDER_LABEL[ride.creatorGender].toLowerCase()} student`}
+            >
+              {GENDER_LABEL[ride.creatorGender]}
+            </span>
+          ) : null}
+        </div>
       </header>
 
       {ride.notes ? (
@@ -86,20 +96,13 @@ export default function RideCard({ ride, currentUserId, onUpdated }: Props) {
       ) : null}
 
       <footer className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
-        <div className="min-w-0 text-xs text-ink-subtle">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="truncate text-ink-muted">{ride.creatorName}</span>
-            {ride.creatorGender ? (
-              <span
-                className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${GENDER_BADGE_CLASS[ride.creatorGender]}`}
-                title={`Posted by a ${GENDER_LABEL[ride.creatorGender].toLowerCase()} student`}
-              >
-                {GENDER_LABEL[ride.creatorGender]}
-              </span>
-            ) : null}
-          </span>
-          <span className="mx-1.5">·</span>
-          <span>{formatRelativeTime(ride.createdAt)}</span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-ink">
+            {ride.creatorName}
+          </p>
+          <p className="mt-0.5 text-xs text-ink-subtle">
+            Posted {formatRelativeTime(ride.createdAt)}
+          </p>
         </div>
 
         <div className="flex items-center gap-2">

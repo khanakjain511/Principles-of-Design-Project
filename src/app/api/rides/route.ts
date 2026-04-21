@@ -21,8 +21,28 @@ export async function GET() {
       .limit(200)
       .lean();
 
+    const creatorIds = Array.from(
+      new Set(rides.map((r) => String(r.createdBy)))
+    );
+    const creators = await User.find({ _id: { $in: creatorIds } })
+      .select("gender")
+      .lean<{ _id: { toString(): string }; gender?: Gender }[]>();
+
+    const genderById = new Map<string, Gender | undefined>();
+    for (const c of creators) {
+      genderById.set(c._id.toString(), c.gender);
+    }
+
     return NextResponse.json({
-      rides: rides.map((r) => ({ ...r, _id: String(r._id), createdBy: String(r.createdBy) })),
+      rides: rides.map((r) => {
+        const id = String(r.createdBy);
+        return {
+          ...r,
+          _id: String(r._id),
+          createdBy: id,
+          creatorGender: genderById.get(id) ?? r.creatorGender ?? undefined,
+        };
+      }),
     });
   } catch (err) {
     console.error("GET /api/rides failed:", err);
