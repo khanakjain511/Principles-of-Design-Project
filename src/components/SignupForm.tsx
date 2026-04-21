@@ -60,7 +60,7 @@ export default function SignupForm() {
           autoComplete="name"
           required
           minLength={2}
-          placeholder="Khanak Jain"
+          placeholder="Your Name"
           className={inputClass}
         />
       </Field>
