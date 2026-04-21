@@ -1,4 +1,4 @@
-# Campus Rides
+# SmartRide Connect
 
 A minimal, internal notice board for students at Rishihood / NST to coordinate
 shared rides between campus (Sonipat) and nearby cities (Delhi, Gurgaon,

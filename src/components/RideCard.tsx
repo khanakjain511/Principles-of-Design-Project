@@ -4,6 +4,7 @@ import { useState } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import { formatRelativeTime, formatRideDate, whatsappLink } from "@/lib/format";
 import type { RideStatus } from "@/lib/constants";
+import { GENDER_LABEL, type Gender } from "@/lib/gender";
 
 export type Ride = {
   _id: string;
@@ -18,7 +19,15 @@ export type Ride = {
   creatorName: string;
   creatorEmail: string;
   creatorImage?: string;
+  creatorGender?: Gender;
   createdAt: string;
+};
+
+const GENDER_BADGE_CLASS: Record<Gender, string> = {
+  female: "border-pink-200 bg-pink-50 text-pink-700",
+  male: "border-blue-200 bg-blue-50 text-blue-700",
+  "non-binary": "border-violet-200 bg-violet-50 text-violet-700",
+  "prefer-not-to-say": "border-line bg-surface text-ink-muted",
 };
 
 type Props = {
@@ -54,7 +63,7 @@ export default function RideCard({ ride, currentUserId, onUpdated }: Props) {
     }
   }
 
-  const waMessage = `Hi ${ride.creatorName.split(" ")[0]}, I saw your ride from ${ride.from} to ${ride.to} on Campus Rides. Is the seat still open?`;
+  const waMessage = `Hi ${ride.creatorName.split(" ")[0]}, I saw your ride from ${ride.from} to ${ride.to} on SmartRide Connect. Is the seat still open?`;
 
   return (
     <article className="group border border-line bg-white p-5 transition-colors hover:border-ink/30">
@@ -78,7 +87,17 @@ export default function RideCard({ ride, currentUserId, onUpdated }: Props) {
 
       <footer className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
         <div className="min-w-0 text-xs text-ink-subtle">
-          <span className="truncate text-ink-muted">{ride.creatorName}</span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="truncate text-ink-muted">{ride.creatorName}</span>
+            {ride.creatorGender ? (
+              <span
+                className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${GENDER_BADGE_CLASS[ride.creatorGender]}`}
+                title={`Posted by a ${GENDER_LABEL[ride.creatorGender].toLowerCase()} student`}
+              >
+                {GENDER_LABEL[ride.creatorGender]}
+              </span>
+            ) : null}
+          </span>
           <span className="mx-1.5">·</span>
           <span>{formatRelativeTime(ride.createdAt)}</span>
         </div>

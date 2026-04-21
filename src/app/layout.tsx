@@ -3,7 +3,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Smart Ride Connect",
+  title: "SmartRide Connect",
   description:
     "A simple notice board for sharing rides between campus and nearby cities.",
 };

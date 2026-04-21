@@ -15,7 +15,7 @@ export default async function Navbar() {
           href="/dashboard"
           className="text-sm font-semibold tracking-tight text-ink"
         >
-          Campus Rides
+          SmartRide Connect
         </Link>
 
         {user ? (

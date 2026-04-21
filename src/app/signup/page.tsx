@@ -17,7 +17,7 @@ export default async function SignupPage() {
             href="/"
             className="text-sm font-medium uppercase tracking-[0.18em] text-ink-subtle"
           >
-            Campus Rides
+            SmartRide Connect
           </Link>
           <h1 className="mt-6 text-2xl font-semibold tracking-tight">
             Create account

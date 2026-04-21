@@ -18,6 +18,7 @@ export default function SignupForm() {
     const payload = {
       name: String(data.get("name") ?? "").trim(),
       email: String(data.get("email") ?? "").trim(),
+      gender: String(data.get("gender") ?? ""),
       password: String(data.get("password") ?? ""),
     };
 
@@ -75,6 +76,24 @@ export default function SignupForm() {
           placeholder="you@nst.rishihood.edu.in"
           className={inputClass}
         />
+      </Field>
+
+      <Field label="Gender" htmlFor="gender">
+        <select
+          id="gender"
+          name="gender"
+          required
+          defaultValue=""
+          className={inputClass}
+        >
+          <option value="" disabled>
+            Select your gender
+          </option>
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+          <option value="non-binary">Non-binary</option>
+          <option value="prefer-not-to-say">Prefer not to say</option>
+        </select>
       </Field>
 
       <Field

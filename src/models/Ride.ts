@@ -1,5 +1,6 @@
 import { Schema, model, models, Types, type Model } from "mongoose";
 import { RIDE_STATUSES, type RideStatus } from "@/lib/constants";
+import { GENDER_VALUES, type Gender } from "@/models/User";
 
 export interface RideDoc {
   _id: Types.ObjectId;
@@ -14,6 +15,7 @@ export interface RideDoc {
   creatorName: string;
   creatorEmail: string;
   creatorImage?: string;
+  creatorGender?: Gender;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +43,7 @@ const rideSchema = new Schema<RideDoc>(
     creatorName: { type: String, required: true },
     creatorEmail: { type: String, required: true },
     creatorImage: { type: String },
+    creatorGender: { type: String, enum: GENDER_VALUES },
   },
   { timestamps: true }
 );

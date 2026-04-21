@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
+import { User, GENDER_VALUES, type Gender } from "@/models/User";
 import { isAllowedEmail } from "@/lib/auth";
 import { ALLOWED_DOMAINS } from "@/lib/constants";
 
@@ -18,6 +18,7 @@ export async function POST(req: Request) {
   const name = String(body.name ?? "").trim();
   const email = String(body.email ?? "").trim().toLowerCase();
   const password = String(body.password ?? "");
+  const gender = String(body.gender ?? "").trim().toLowerCase() as Gender;
 
   if (!name || name.length < 2) {
     return NextResponse.json({ error: "Please enter your full name" }, { status: 400 });
@@ -30,6 +31,9 @@ export async function POST(req: Request) {
       { error: `Only ${ALLOWED_DOMAINS.join(" or ")} accounts are allowed` },
       { status: 403 }
     );
+  }
+  if (!GENDER_VALUES.includes(gender)) {
+    return NextResponse.json({ error: "Please select your gender" }, { status: 400 });
   }
   if (password.length < 8) {
     return NextResponse.json(
@@ -50,7 +54,7 @@ export async function POST(req: Request) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    await User.create({ email, name, passwordHash });
+    await User.create({ email, name, gender, passwordHash });
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (err) {

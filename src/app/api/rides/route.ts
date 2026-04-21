@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Ride } from "@/models/Ride";
+import { User, type Gender } from "@/models/User";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,11 @@ export async function POST(req: Request) {
 
   try {
     await connectDB();
+
+    const creator = await User.findById(session.user.id)
+      .select("gender")
+      .lean<{ gender?: Gender } | null>();
+
     const ride = await Ride.create({
       from,
       to,
@@ -79,6 +85,7 @@ export async function POST(req: Request) {
       creatorName: session.user.name ?? "Student",
       creatorEmail: session.user.email ?? "",
       creatorImage: session.user.image ?? undefined,
+      creatorGender: creator?.gender,
     });
 
     return NextResponse.json(
