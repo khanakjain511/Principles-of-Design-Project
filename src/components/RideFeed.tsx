@@ -6,6 +6,7 @@ import { CAMPUS } from "@/lib/constants";
 
 type Props = {
   currentUserId?: string;
+  showFilters?: boolean;
 };
 
 type Group = "leaving" | "coming" | "other";
@@ -37,10 +38,12 @@ function classify(ride: Ride): Group {
   return "other";
 }
 
-export default function RideFeed({ currentUserId }: Props) {
+export default function RideFeed({ currentUserId, showFilters = false }: Props) {
   const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [destination, setDestination] = useState("");
+  const [date, setDate] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -61,11 +64,22 @@ export default function RideFeed({ currentUserId }: Props) {
     };
   }, []);
 
+  const filtered = useMemo(() => {
+    const dest = destination.trim().toLowerCase();
+    return rides.filter((r) => {
+      if (dest && !r.from.toLowerCase().includes(dest) && !r.to.toLowerCase().includes(dest)) {
+        return false;
+      }
+      if (date && r.date !== date) return false;
+      return true;
+    });
+  }, [rides, destination, date]);
+
   const grouped = useMemo(() => {
     const out: Record<Group, Ride[]> = { leaving: [], coming: [], other: [] };
-    for (const ride of rides) out[classify(ride)].push(ride);
+    for (const ride of filtered) out[classify(ride)].push(ride);
     return out;
-  }, [rides]);
+  }, [filtered]);
 
   function handleUpdated(updated: Ride) {
     setRides((prev) => prev.map((r) => (r._id === updated._id ? updated : r)));
@@ -89,8 +103,50 @@ export default function RideFeed({ currentUserId }: Props) {
     );
   }
 
+  const filtersActive = destination.trim() !== "" || date !== "";
+
   return (
     <div className="space-y-10">
+      {showFilters ? (
+        <div className="flex flex-wrap items-end gap-3 border border-line bg-surface px-4 py-3">
+          <label className="block min-w-0 flex-1">
+            <span className="mb-1 block text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
+              Destination
+            </span>
+            <input
+              type="text"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              placeholder="e.g. Delhi"
+              className="w-full border border-line bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-subtle focus:border-ink focus:outline-none"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
+              Date
+            </span>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="border border-line bg-white px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
+            />
+          </label>
+          {filtersActive ? (
+            <button
+              type="button"
+              onClick={() => {
+                setDestination("");
+                setDate("");
+              }}
+              className="border border-line bg-white px-3 py-2 text-xs font-medium text-ink-muted transition-colors hover:bg-white/70"
+            >
+              Clear
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       {SECTIONS.map((section) => (
         <section key={section.id}>
           <div className="mb-3 flex items-baseline justify-between gap-3">

@@ -1,13 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { CAMPUS } from "@/lib/constants";
+import type { Ride } from "@/components/RideCard";
 
 const COMMON_CITIES = [CAMPUS, "Delhi", "Gurgaon", "Noida"];
 
-export default function CreateRideForm() {
+type Props = {
+  onCreated?: (ride: Ride) => void;
+};
+
+export default function CreateRideForm({ onCreated }: Props = {}) {
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,9 +40,15 @@ export default function CreateRideForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         throw new Error(data.error ?? "Failed to create ride");
+      }
+      if (onCreated && data?.ride) {
+        onCreated(data.ride as Ride);
+        formRef.current?.reset();
+        setSubmitting(false);
+        return;
       }
       router.push("/dashboard");
       router.refresh();
@@ -47,7 +59,7 @@ export default function CreateRideForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="From" htmlFor="from">
           <input
@@ -141,13 +153,15 @@ export default function CreateRideForm() {
       ) : null}
 
       <div className="flex items-center justify-end gap-3">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="border border-line bg-white px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface"
-        >
-          Cancel
-        </button>
+        {onCreated ? null : (
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="border border-line bg-white px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface"
+          >
+            Cancel
+          </button>
+        )}
         <button
           type="submit"
           disabled={submitting}
