@@ -34,11 +34,13 @@ type Props = {
   ride: Ride;
   currentUserId?: string;
   onUpdated?: (ride: Ride) => void;
+  onDeleted?: (rideId: string) => void;
 };
 
-export default function RideCard({ ride, currentUserId, onUpdated }: Props) {
+export default function RideCard({ ride, currentUserId, onUpdated, onDeleted }: Props) {
   const [status, setStatus] = useState<RideStatus>(ride.status);
   const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const isOwner = currentUserId && currentUserId === ride.createdBy;
 
   async function toggleStatus() {
@@ -60,6 +62,21 @@ export default function RideCard({ ride, currentUserId, onUpdated }: Props) {
       alert("Could not update status. Please try again.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function deleteRide() {
+    if (!isOwner || deleting) return;
+    if (!confirm("Are you sure you want to delete this ride?")) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/rides/${ride._id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete");
+      onDeleted?.(ride._id);
+    } catch (err) {
+      console.error(err);
+      alert("Could not delete ride. Please try again.");
+      setDeleting(false);
     }
   }
 
@@ -107,17 +124,26 @@ export default function RideCard({ ride, currentUserId, onUpdated }: Props) {
 
         <div className="flex items-center gap-2">
           {isOwner ? (
-            <button
-              onClick={toggleStatus}
-              disabled={busy}
-              className="border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-surface disabled:opacity-60"
-            >
-              {busy
-                ? "Updating…"
-                : status === "active"
-                  ? "Mark as full"
-                  : "Reopen ride"}
-            </button>
+            <>
+              <button
+                onClick={toggleStatus}
+                disabled={busy || deleting}
+                className="border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-surface disabled:opacity-60"
+              >
+                {busy
+                  ? "Updating…"
+                  : status === "active"
+                    ? "Mark as full"
+                    : "Reopen ride"}
+              </button>
+              <button
+                onClick={deleteRide}
+                disabled={busy || deleting}
+                className="border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
+              >
+                {deleting ? "Deleting…" : "Delete"}
+              </button>
+            </>
           ) : null}
 
           {status === "active" ? (

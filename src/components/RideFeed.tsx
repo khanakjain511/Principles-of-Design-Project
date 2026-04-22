@@ -85,6 +85,10 @@ export default function RideFeed({ currentUserId, showFilters = false }: Props) 
     setRides((prev) => prev.map((r) => (r._id === updated._id ? updated : r)));
   }
 
+  function handleDeleted(rideId: string) {
+    setRides((prev) => prev.filter((r) => r._id !== rideId));
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -173,6 +177,7 @@ export default function RideFeed({ currentUserId, showFilters = false }: Props) 
                   ride={ride}
                   currentUserId={currentUserId}
                   onUpdated={handleUpdated}
+                  onDeleted={handleDeleted}
                 />
               ))}
             </div>

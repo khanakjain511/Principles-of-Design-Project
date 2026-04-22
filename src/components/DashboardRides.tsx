@@ -44,6 +44,10 @@ export default function DashboardRides({ currentUserId }: Props) {
     setRides((prev) => prev.map((r) => (r._id === updated._id ? updated : r)));
   }
 
+  function handleDeleted(rideId: string) {
+    setRides((prev) => prev.filter((r) => r._id !== rideId));
+  }
+
   return (
     <div className="space-y-10">
       <section>
@@ -110,6 +114,7 @@ export default function DashboardRides({ currentUserId }: Props) {
                 ride={ride}
                 currentUserId={currentUserId}
                 onUpdated={handleUpdated}
+                onDeleted={handleDeleted}
               />
             ))}
           </div>
