@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import SignOutButton from "@/components/SignOutButton";
+import NavLinks from "@/components/NavLinks";
 
 export default async function Navbar() {
   const session = await getServerSession(authOptions);
@@ -10,31 +11,15 @@ export default async function Navbar() {
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-white/80 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-6">
-        <div className="flex items-center gap-6">
-          <Link
-            href="/"
-            className="text-sm font-semibold tracking-tight text-ink"
-          >
-            SmartRide Connect
-          </Link>
-          <nav className="hidden items-center gap-4 sm:flex">
-            <Link
-              href="/"
-              className="text-sm text-ink-muted transition-colors hover:text-ink"
-            >
-              Home
-            </Link>
-            {user ? (
-              <Link
-                href="/dashboard"
-                className="text-sm text-ink-muted transition-colors hover:text-ink"
-              >
-                Dashboard
-              </Link>
-            ) : null}
-          </nav>
-        </div>
+      <div className="relative mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-6">
+        <Link
+          href="/"
+          className="text-sm font-semibold tracking-tight text-ink"
+        >
+          SmartRide Connect
+        </Link>
+
+        <NavLinks showDashboard={Boolean(user)} />
 
         {user ? (
           <div className="flex items-center gap-4">
