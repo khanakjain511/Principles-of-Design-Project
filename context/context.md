@@ -12,19 +12,24 @@ SmartRide Connect (also referred to as `campus-rides`) is a minimal, internal no
 Students at Rishihood University / NST holding an email address with domains:
 - `@nst.rishihood.edu.in`
 - `@rishihood.edu.in`
+- `@csds.rishihood.edu.in`
+- `@psy.rishihood.edu.in`
+- `@makers.rishihood.edu.in`
 
 ## Tech Stack
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Database**: MongoDB via Mongoose
-- **Authentication**: NextAuth (Credentials provider with bcryptjs for password hashing, JWT sessions)
+- **Authentication**: NextAuth (Google OAuth + Credentials provider with bcryptjs for password hashing, JWT sessions)
+- **Notifications**: `react-hot-toast` for global UI notifications
 
 ## Key Entities
-1. **User**: Represents a student. Requires university email for sign-up.
+1. **User**: Represents a student. Requires university email for sign-up (via Google or Credentials).
 2. **Ride**: Represents a ride offering. Stores route information, departure time, capacity, WhatsApp contact number, and denormalized creator details for efficient querying.
 
 ## Development Setup
 - Requires Node.js and npm.
 - Requires a MongoDB connection string (`MONGODB_URI`).
 - Requires NextAuth configuration (`NEXTAUTH_URL`, `NEXTAUTH_SECRET`).
+- Requires Google OAuth configuration (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`).

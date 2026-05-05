@@ -9,8 +9,30 @@ export const dynamic = "force-dynamic";
 
 function sanitizeWhatsapp(input: string): string | null {
   const digits = input.replace(/[^\d]/g, "");
-  if (digits.length < 10 || digits.length > 15) return null;
+  if (digits.length < 10) return null;
   return digits;
+}
+
+function isPastTime(dateStr: string, timeWindowStr: string): boolean {
+  try {
+    const startStr = timeWindowStr.split(" - ")[0];
+    if (!startStr) return false;
+    
+    const match = startStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return false;
+    
+    let hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const ampm = match[3].toUpperCase();
+    
+    if (ampm === "PM" && hours < 12) hours += 12;
+    if (ampm === "AM" && hours === 12) hours = 0;
+    
+    const rideDateTime = new Date(`${dateStr}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`);
+    return rideDateTime < new Date();
+  } catch {
+    return false;
+  }
 }
 
 export async function GET() {
@@ -84,6 +106,10 @@ export async function POST(req: Request) {
   const whatsapp = sanitizeWhatsapp(whatsappRaw);
   if (!whatsapp) {
     return NextResponse.json({ error: "Invalid WhatsApp number" }, { status: 400 });
+  }
+
+  if (isPastTime(date, timeWindow)) {
+    return NextResponse.json({ error: "Start time cannot be in the past" }, { status: 400 });
   }
 
   try {

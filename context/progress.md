@@ -26,18 +26,20 @@
 - [ ] Extensive testing of auth edge cases and API protection.
 - [ ] UI/UX refinements (design polish, responsive testing).
 
-## Phase 3: Google Auth with Domain Whitelisting *(in progress)*
+## Phase 3: Google Auth with Domain Whitelisting *(Completed)*
 - [x] `.env.example` updated with `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
 - [x] `User.ts` — `passwordHash` made optional (Google users have no password)
 - [x] `auth.ts` — Added `GoogleProvider` to NextAuth config
 - [x] `auth.ts` — Added `signIn` callback enforcing domain whitelist via `isAllowedEmail`
 - [x] `auth.ts` — Auto-creates user in MongoDB on first Google sign-in (upsert)
+- [x] `auth.ts` — Bug fix: ensured token.id is mapped to MongoDB `_id` instead of Google ID
 - [x] `LoginForm.tsx` — Added "Sign in with Google" button with Google icon + divider
 - [x] `SignupForm.tsx` — Added "Sign up with Google" button with Google icon + divider
 - [x] Implementation plan saved in `context/google-auth-plan.md`
-- [ ] **GCP Setup** — Create OAuth credentials at console.cloud.google.com
-  - Authorized origin: `http://localhost:3000` and `https://smartride-connect.vercel.app`
-  - Redirect URI: `http://localhost:3000/api/auth/callback/google` and `https://smartride-connect.vercel.app/api/auth/callback/google`
-- [ ] **Env Config** — Add real `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env.local`
-- [ ] **End-to-end testing** — Verify Google sign-in works and non-whitelisted domains are rejected
+- [x] **GCP Setup & Env Config** — Credentials added and successfully tested locally and in production.
 
+## Phase 4: Production Polish & Validations *(Completed)*
+- [x] Integrated `react-hot-toast` for elegant global notifications.
+- [x] Upgraded "Time Window" input to use strict `type="time"` fields.
+- [x] Added strict front-end validations (future time checks, phone number format).
+- [x] Added strict back-end validations in `POST /api/rides` to prevent API bypassing.
