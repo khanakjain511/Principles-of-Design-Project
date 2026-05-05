@@ -16,7 +16,7 @@ export default function NavLinks({ showDashboard }: Props) {
   if (showDashboard) items.push({ href: "/dashboard", label: "Dashboard" });
 
   return (
-    <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 sm:flex">
+    <nav className="flex items-center gap-1 sm:gap-2 w-full justify-start sm:justify-center overflow-x-auto no-scrollbar">
       {items.map((item) => {
         const isActive =
           item.href === "/" ? pathname === "/" : pathname?.startsWith(item.href);
@@ -27,8 +27,8 @@ export default function NavLinks({ showDashboard }: Props) {
             aria-current={isActive ? "page" : undefined}
             className={
               isActive
-                ? "border-b border-ink pb-0.5 text-sm font-medium text-ink"
-                : "border-b border-transparent pb-0.5 text-sm text-ink-muted transition-colors hover:text-ink"
+                ? "bg-ink text-white px-3.5 py-1.5 rounded-full text-sm font-medium"
+                : "text-ink-muted hover:text-ink hover:bg-surface px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors"
             }
           >
             {item.label}

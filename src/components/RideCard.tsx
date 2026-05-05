@@ -83,16 +83,16 @@ export default function RideCard({ ride, currentUserId, onUpdated, onDeleted }: 
   const waMessage = `Hi ${ride.creatorName.split(" ")[0]}, I saw your ride from ${ride.from} to ${ride.to} on SmartRide Connect. Is the seat still open?`;
 
   return (
-    <article className="group border border-line bg-white p-5 transition-colors hover:border-ink/30">
+    <article className="group border border-line bg-white p-5 transition-colors hover:border-ink/30 flex flex-col h-full">
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold tracking-tight text-ink">
+          <h3 className="truncate text-lg font-bold tracking-tight text-ink">
             {ride.from}
-            <span className="mx-2 text-ink-subtle">→</span>
+            <span className="mx-2 font-normal text-ink-muted">→</span>
             {ride.to}
           </h3>
-          <p className="mt-1 text-sm text-ink-muted">
-            {formatRideDate(ride.date)} · {ride.timeWindow}
+          <p className="mt-1.5 text-sm font-medium text-ink-muted">
+            {formatRideDate(ride.date)} <span className="mx-1.5 text-line">•</span> {ride.timeWindow}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -109,26 +109,41 @@ export default function RideCard({ ride, currentUserId, onUpdated, onDeleted }: 
       </header>
 
       {ride.notes ? (
-        <p className="mt-3 text-sm text-ink-muted">{ride.notes}</p>
+        <p className="mt-3 text-sm text-ink-subtle bg-surface/50 p-3 rounded-md border border-line/50">{ride.notes}</p>
       ) : null}
 
-      <footer className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-ink">
-            {ride.creatorName}
-          </p>
-          <p className="mt-0.5 text-xs text-ink-subtle">
-            Posted {formatRelativeTime(ride.createdAt)}
-          </p>
+      <div className="flex-1" />
+
+      <footer className="mt-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-t border-line pt-4">
+        <div className="flex items-center gap-3 min-w-0">
+          {ride.creatorImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={ride.creatorImage} alt={ride.creatorName} className="w-9 h-9 rounded-full border border-line object-cover" />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-surface border border-line flex items-center justify-center text-xs font-bold text-ink-muted">
+              {ride.creatorName.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+               <p className="truncate text-sm font-semibold text-ink">
+                 {ride.creatorName}
+               </p>
+               <span className="bg-blue-50 text-blue-700 border border-blue-200 text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-sm" title="Verified University Student">Verified</span>
+            </div>
+            <p className="text-xs text-ink-subtle mt-0.5">
+              Posted {formatRelativeTime(ride.createdAt)}
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {isOwner ? (
             <>
               <button
                 onClick={toggleStatus}
                 disabled={busy || deleting}
-                className="border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-surface disabled:opacity-60"
+                className="flex-1 sm:flex-none justify-center border border-line bg-white px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface disabled:opacity-60"
               >
                 {busy
                   ? "Updating…"
@@ -139,25 +154,25 @@ export default function RideCard({ ride, currentUserId, onUpdated, onDeleted }: 
               <button
                 onClick={deleteRide}
                 disabled={busy || deleting}
-                className="border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
+                className="flex-1 sm:flex-none justify-center border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
               >
                 {deleting ? "Deleting…" : "Delete"}
               </button>
             </>
           ) : null}
 
-          {status === "active" ? (
+          {!isOwner && status === "active" ? (
             <a
               href={whatsappLink(ride.whatsapp, waMessage)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 bg-ink px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-black"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 bg-ink px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-black"
             >
               Contact on WhatsApp
             </a>
-          ) : (
-            <span className="text-xs text-ink-subtle">Closed</span>
-          )}
+          ) : !isOwner && status !== "active" ? (
+            <span className="inline-flex w-full sm:w-auto justify-center px-4 py-2 text-sm font-medium text-ink-subtle bg-surface border border-line">Closed</span>
+          ) : null}
         </div>
       </footer>
     </article>
