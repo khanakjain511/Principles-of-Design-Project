@@ -13,7 +13,7 @@ const userSchema = new Schema(
       enum: GENDER_VALUES,
     },
     image: { type: String },
-    passwordHash: { type: String, required: true, select: false },
+    passwordHash: { type: String, select: false },
   },
   { timestamps: true }
 );

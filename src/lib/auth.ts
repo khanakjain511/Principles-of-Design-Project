@@ -1,5 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { ALLOWED_DOMAINS } from "@/lib/constants";
 import { connectDB } from "@/lib/db";
@@ -14,6 +15,10 @@ export function isAllowedEmail(email?: string | null): boolean {
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
     CredentialsProvider({
       name: "Email and password",
       credentials: {
@@ -57,6 +62,24 @@ export const authOptions: NextAuthOptions = {
     error: "/login",
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        if (!isAllowedEmail(user.email)) return false;
+
+        await connectDB();
+        const existingUser = await User.findOne({ email: user.email });
+        
+        if (!existingUser) {
+          await User.create({
+            email: user.email,
+            name: user.name || "Student",
+            image: user.image,
+          });
+        }
+        return true;
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = (user as { id: string }).id;
