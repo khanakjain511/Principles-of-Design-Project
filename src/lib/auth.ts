@@ -80,18 +80,35 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      // 1. New Sign-In Flow
       if (user) {
-        token.id = (user as { id: string }).id;
+        if (account?.provider === "google") {
+          await connectDB();
+          const dbUser = await User.findOne({ email: user.email }).lean<{ _id: { toString(): string } }>();
+          token.id = dbUser ? dbUser._id.toString() : (user as { id: string }).id;
+        } else {
+          token.id = (user as { id: string }).id;
+        }
         token.email = user.email ?? token.email;
         token.name = user.name ?? token.name;
         token.picture = (user.image as string | undefined) ?? token.picture;
       }
+
+      // 2. Fix for old cookies (if token.id is a Google ID instead of a MongoDB ObjectId)
+      if (token.id && token.id.length !== 24 && token.email) {
+        await connectDB();
+        const dbUser = await User.findOne({ email: token.email }).lean<{ _id: { toString(): string } }>();
+        if (dbUser) {
+          token.id = dbUser._id.toString();
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.id) {
-        session.user.id = token.id;
+        session.user.id = token.id as string;
       }
       return session;
     },
