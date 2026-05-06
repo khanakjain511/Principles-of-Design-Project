@@ -1,6 +1,9 @@
 export const ALLOWED_DOMAINS = [
   "nst.rishihood.edu.in",
   "rishihood.edu.in",
+  "csds.rishihood.edu.in",
+  "psy.rishihood.edu.in",
+  "makers.rishihood.edu.in"
   "souravyadav2987@gmail.com"
 ] as const;
 

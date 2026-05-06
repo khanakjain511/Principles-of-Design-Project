@@ -63,7 +63,7 @@ export default function DashboardRides({ currentUserId }: Props) {
           <button
             type="button"
             onClick={() => setShowForm((s) => !s)}
-            className="border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-surface"
+            className="border border-line bg-white px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface"
           >
             {showForm ? "Hide form" : "New ride"}
           </button>
