@@ -4,7 +4,7 @@ export const ALLOWED_DOMAINS = [
   "csds.rishihood.edu.in",
   "psy.rishihood.edu.in",
   "makers.rishihood.edu.in",
-  "souravyadav2987@gmail.com"
+  "gmail.com"
 ] as const;
 
 export const CAMPUS = "Sonipat";
