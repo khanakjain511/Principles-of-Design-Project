@@ -20,9 +20,13 @@
 
 ## Authentication & Security
 - **NextAuth**: Use NextAuth for handling sessions.
-- **Middleware**: Use Next.js Middleware (`middleware.ts`) to protect private routes (`/dashboard`, `/rides`).
+- **Middleware**: Use Next.js Middleware (`middleware.ts`) as private-by-default protection. Keep `/login`, `/signup`, and required NextAuth endpoints public; protect new pages and APIs unless they are explicitly auth-related.
 - **Server-side Checks**: Always verify the user's session and permissions in Server Actions or Route Handlers before performing sensitive operations (e.g., only the creator can update or delete their ride).
 - **Passwords**: Never store plain text passwords. Always use `bcryptjs` for hashing and verification.
+
+## Notifications
+- Use `react-hot-toast` for user-facing task feedback, including validation errors, ride creation, status updates, delete confirmation, and delete results.
+- Avoid blocking browser `alert` / `confirm` dialogs for core ride workflows so mobile and desktop experiences stay consistent.
 
 ## Git & Version Control
 - Commit often with descriptive messages.

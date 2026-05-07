@@ -9,7 +9,7 @@
 - [x] Sign-up page (`/signup`)
 - [x] Sign-in page (`/login`)
 - [x] JWT session strategy implemented
-- [x] Route protection via Next.js Middleware (`middleware.ts` protecting `/dashboard` and `/rides/*`)
+- [x] Private-by-default route protection via Next.js Middleware (`middleware.ts` protecting all app/API routes except `/login`, `/signup`, and `/api/auth/*`)
 
 ## Phase 2: Ride Board
 - [x] Ride schema creation (with denormalized creator snapshot)
@@ -20,6 +20,7 @@
 - [x] Ride card UI with WhatsApp integration
 - [x] Ability for owners to flip status (active <-> full)
 - [x] Ability for owners to delete rides
+- [x] Toast feedback for ride creation, status updates, delete confirmation, and deletion results
 
 ## Upcoming / Pending Tasks
 - [ ] Implement automated cleanup jobs for 'expired' rides (as mentioned in notes).

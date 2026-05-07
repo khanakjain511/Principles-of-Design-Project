@@ -5,6 +5,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { formatRelativeTime, formatRideDate, whatsappLink } from "@/lib/format";
 import type { RideStatus } from "@/lib/constants";
 import { GENDER_LABEL, type Gender } from "@/lib/gender";
+import toast, { type Toast } from "react-hot-toast";
 
 export type Ride = {
   _id: string;
@@ -48,34 +49,68 @@ export default function RideCard({ ride, currentUserId, onUpdated, onDeleted }: 
     const next: RideStatus = status === "active" ? "full" : "active";
     setBusy(true);
     try {
-      const res = await fetch(`/api/rides/${ride._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: next }),
-      });
-      if (!res.ok) throw new Error("Failed to update");
-      const data = await res.json();
+      const data = await toast.promise(
+        updateRideStatus(ride._id, next),
+        {
+          loading: next === "full" ? "Marking ride as full..." : "Reopening ride...",
+          success: next === "full" ? "Ride marked as full." : "Ride reopened.",
+          error: (err: unknown) => (err as Error).message,
+        }
+      );
       setStatus(data.ride.status);
       onUpdated?.(data.ride);
     } catch (err) {
       console.error(err);
-      alert("Could not update status. Please try again.");
     } finally {
       setBusy(false);
     }
   }
 
-  async function deleteRide() {
+  function deleteRide() {
     if (!isOwner || deleting) return;
-    if (!confirm("Are you sure you want to delete this ride?")) return;
+    toast(
+      (t: Toast) => (
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-ink">Delete this ride?</p>
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => toast.dismiss(t.id)}
+              className="border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-surface"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                toast.dismiss(t.id);
+                void confirmDeleteRide();
+              }}
+              className="border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 6000 }
+    );
+  }
+
+  async function confirmDeleteRide() {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/rides/${ride._id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
+      await toast.promise(
+        deleteRideById(ride._id),
+        {
+          loading: "Deleting ride...",
+          success: "Ride deleted.",
+          error: (err: unknown) => (err as Error).message,
+        }
+      );
       onDeleted?.(ride._id);
     } catch (err) {
       console.error(err);
-      alert("Could not delete ride. Please try again.");
       setDeleting(false);
     }
   }
@@ -177,4 +212,25 @@ export default function RideCard({ ride, currentUserId, onUpdated, onDeleted }: 
       </footer>
     </article>
   );
+}
+
+async function updateRideStatus(rideId: string, status: RideStatus): Promise<{ ride: Ride }> {
+  const res = await fetch(`/api/rides/${rideId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error ?? "Could not update status. Please try again.");
+  }
+  return data;
+}
+
+async function deleteRideById(rideId: string): Promise<void> {
+  const res = await fetch(`/api/rides/${rideId}`, { method: "DELETE" });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error ?? "Could not delete ride. Please try again.");
+  }
 }
