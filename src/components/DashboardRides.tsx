@@ -3,6 +3,37 @@
 import { useEffect, useState } from "react";
 import RideCard, { type Ride } from "@/components/RideCard";
 import CreateRideForm from "@/components/CreateRideForm";
+import { CAMPUS } from "@/lib/constants";
+
+type Group = "leaving" | "coming" | "other" | "all";
+
+const SECTIONS: { id: Group; title: string; description: string }[] = [
+  {
+    id: "leaving",
+    title: "Leaving Campus",
+    description: `Rides starting from ${CAMPUS}.`,
+  },
+  {
+    id: "coming",
+    title: "Going to Campus",
+    description: `Rides ending at ${CAMPUS}.`,
+  },
+  {
+    id: "other",
+    title: "Other Routes",
+    description: "Rides between other locations.",
+  },
+];
+
+function classify(ride: Ride): "leaving" | "coming" | "other" {
+  const from = ride.from.toLowerCase();
+  const to = ride.to.toLowerCase();
+  const campus = CAMPUS.toLowerCase();
+  
+  if (from.includes(campus) || from.includes("college") || from.includes("clg")) return "leaving";
+  if (to.includes(campus) || to.includes("college") || to.includes("clg")) return "coming";
+  return "other";
+}
 
 type Props = {
   currentUserId: string;
@@ -13,6 +44,7 @@ export default function DashboardRides({ currentUserId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [routeType, setRouteType] = useState<Group>("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -77,7 +109,7 @@ export default function DashboardRides({ currentUserId }: Props) {
       </section>
 
       <section>
-        <div className="mb-3 flex items-baseline justify-between gap-3">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-ink">
               My Rides
@@ -86,7 +118,20 @@ export default function DashboardRides({ currentUserId }: Props) {
               Toggle each ride between Active and Full as plans change.
             </p>
           </div>
-          <span className="text-xs text-ink-subtle">{rides.length}</span>
+          
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-ink-subtle mr-2">{rides.length} rides</span>
+            <select
+              value={routeType}
+              onChange={(e) => setRouteType(e.target.value as Group)}
+              className="rounded-md border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink focus:border-ink focus:outline-none"
+            >
+              <option value="all">All Routes</option>
+              <option value="leaving">Leaving Campus</option>
+              <option value="coming">Going to Campus</option>
+              <option value="other">Other Routes</option>
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -107,16 +152,39 @@ export default function DashboardRides({ currentUserId }: Props) {
             You haven&rsquo;t posted any rides yet.
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {rides.map((ride) => (
-              <RideCard
-                key={ride._id}
-                ride={ride}
-                currentUserId={currentUserId}
-                onUpdated={handleUpdated}
-                onDeleted={handleDeleted}
-              />
-            ))}
+          <div className="space-y-8">
+            {SECTIONS.filter(s => routeType === "all" || s.id === routeType).map((section) => {
+              const sectionRides = rides.filter(r => classify(r) === section.id);
+              if (routeType === "all" && sectionRides.length === 0) return null;
+
+              return (
+                <div key={section.id}>
+                  <div className="mb-3 flex items-baseline justify-between">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-ink-subtle">
+                      {section.title}
+                    </h3>
+                    <span className="text-[10px] text-ink-subtle">{sectionRides.length}</span>
+                  </div>
+                  {sectionRides.length === 0 ? (
+                    <div className="border border-dashed border-line bg-surface/30 px-4 py-6 text-center text-xs text-ink-subtle">
+                      No rides in this category.
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {sectionRides.map((ride) => (
+                        <RideCard
+                          key={ride._id}
+                          ride={ride}
+                          currentUserId={currentUserId}
+                          onUpdated={handleUpdated}
+                          onDeleted={handleDeleted}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </section>

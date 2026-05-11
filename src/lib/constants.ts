@@ -7,7 +7,7 @@ export const ALLOWED_DOMAINS = [
   "gmail.com"
 ] as const;
 
-export const CAMPUS = "Sonipat";
+export const CAMPUS = "Campus";
 
 export const RIDE_STATUSES = ["active", "full", "expired"] as const;
 export type RideStatus = (typeof RIDE_STATUSES)[number];

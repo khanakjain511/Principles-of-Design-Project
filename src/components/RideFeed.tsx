@@ -9,7 +9,7 @@ type Props = {
   showFilters?: boolean;
 };
 
-type Group = "leaving" | "coming" | "other";
+type Group = "leaving" | "coming" | "other" | "all";
 
 const SECTIONS: { id: Group; title: string; description: string }[] = [
   {
@@ -33,8 +33,9 @@ function classify(ride: Ride): Group {
   const from = ride.from.toLowerCase();
   const to = ride.to.toLowerCase();
   const campus = CAMPUS.toLowerCase();
-  if (from.includes(campus)) return "leaving";
-  if (to.includes(campus)) return "coming";
+  
+  if (from.includes(campus) || from.includes("college") || from.includes("clg")) return "leaving";
+  if (to.includes(campus) || to.includes("college") || to.includes("clg")) return "coming";
   return "other";
 }
 
@@ -44,6 +45,7 @@ export default function RideFeed({ currentUserId, showFilters = false }: Props) 
   const [error, setError] = useState<string | null>(null);
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
+  const [routeType, setRouteType] = useState<Group>("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -76,7 +78,7 @@ export default function RideFeed({ currentUserId, showFilters = false }: Props) 
   }, [rides, destination, date]);
 
   const grouped = useMemo(() => {
-    const out: Record<Group, Ride[]> = { leaving: [], coming: [], other: [] };
+    const out: Record<Group, Ride[]> = { leaving: [], coming: [], other: [], all: [] };
     for (const ride of filtered) out[classify(ride)].push(ride);
     return out;
   }, [filtered]);
@@ -107,7 +109,7 @@ export default function RideFeed({ currentUserId, showFilters = false }: Props) 
     );
   }
 
-  const filtersActive = destination.trim() !== "" || date !== "";
+  const filtersActive = destination.trim() !== "" || date !== "" || routeType !== "all";
 
   return (
     <div className="space-y-10">
@@ -142,6 +144,7 @@ export default function RideFeed({ currentUserId, showFilters = false }: Props) 
               onClick={() => {
                 setDestination("");
                 setDate("");
+                setRouteType("all");
               }}
               className="rounded-md border border-line bg-white px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface hover:text-ink w-full sm:w-auto"
             >
@@ -151,39 +154,63 @@ export default function RideFeed({ currentUserId, showFilters = false }: Props) 
         </div>
       ) : null}
 
-      {SECTIONS.map((section) => (
-        <section key={section.id}>
-          <div className="mb-3 flex items-baseline justify-between gap-3">
-            <div>
-              <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-ink">
-                {section.title}
-              </h2>
-              <p className="mt-1 text-xs text-ink-subtle">{section.description}</p>
-            </div>
-            <span className="text-xs text-ink-subtle">
-              {grouped[section.id].length}
-            </span>
-          </div>
+      <div className="flex items-center justify-between border-b border-line pb-4">
+        <div className="flex items-center gap-4">
+          <span className="text-xs font-bold uppercase tracking-widest text-ink-muted">
+            Viewing:
+          </span>
+          <select
+            value={routeType}
+            onChange={(e) => setRouteType(e.target.value as Group)}
+            className="rounded-md border border-line bg-white px-3 py-1.5 text-xs font-medium text-ink focus:border-ink focus:outline-none"
+          >
+            <option value="all">All Routes</option>
+            <option value="leaving">Leaving Campus</option>
+            <option value="coming">Going to Campus</option>
+            <option value="other">Other Routes</option>
+          </select>
+        </div>
+        <span className="text-xs text-ink-subtle">{filtered.length} rides found</span>
+      </div>
 
-          {grouped[section.id].length === 0 ? (
-            <div className="border border-dashed border-line bg-white px-4 py-8 text-center text-sm text-ink-subtle">
-              No rides yet.
+      {SECTIONS.filter(s => routeType === "all" || s.id === routeType).map((section) => {
+        const sectionRides = grouped[section.id];
+        if (routeType === "all" && sectionRides.length === 0) return null;
+
+        return (
+          <section key={section.id}>
+            <div className="mb-3 flex items-baseline justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-ink">
+                  {section.title}
+                </h2>
+                <p className="mt-1 text-xs text-ink-subtle">{section.description}</p>
+              </div>
+              <span className="text-xs text-ink-subtle">
+                {sectionRides.length}
+              </span>
             </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {grouped[section.id].map((ride) => (
-                <RideCard
-                  key={ride._id}
-                  ride={ride}
-                  currentUserId={currentUserId}
-                  onUpdated={handleUpdated}
-                  onDeleted={handleDeleted}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-      ))}
+
+            {sectionRides.length === 0 ? (
+              <div className="border border-dashed border-line bg-white px-4 py-8 text-center text-sm text-ink-subtle">
+                No rides in this category.
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {sectionRides.map((ride) => (
+                  <RideCard
+                    key={ride._id}
+                    ride={ride}
+                    currentUserId={currentUserId}
+                    onUpdated={handleUpdated}
+                    onDeleted={handleDeleted}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
