@@ -70,11 +70,8 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await User.findOne({ email: user.email });
         
         if (!existingUser) {
-          await User.create({
-            email: user.email,
-            name: user.name || "Student",
-            image: user.image,
-          });
+          // No signup allowed - users must already exist in the database
+          return false;
         }
         return true;
       }
