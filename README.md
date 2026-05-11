@@ -21,10 +21,11 @@ ride owner manually marks the ride as full when seats are filled.
 
 - Email + password sign-in restricted to `@nst.rishihood.edu.in` and
   `@rishihood.edu.in`
-- Self-signup at `/signup`, passwords are bcrypt-hashed and stored on the
+- Password verification for existing credential-based accounts backed by the
   `User` document
 - JWT session strategy
-- Protected `/dashboard` and `/rides/*` routes via middleware
+- Protected application routes via middleware, with `/login` as the only
+  public page
 
 **Phase 2 — Ride board**
 
@@ -70,12 +71,10 @@ src/
   app/
     api/
       auth/[...nextauth]/route.ts   # NextAuth handler
-      auth/signup/route.ts          # Create account
       rides/route.ts                # GET, POST
       rides/[id]/route.ts           # PATCH, DELETE
     dashboard/page.tsx              # Ride board
     login/page.tsx                  # Sign-in page
-    signup/page.tsx                 # Create account
     rides/new/page.tsx              # Create ride form page
     layout.tsx
     page.tsx                        # Redirects based on auth
@@ -87,7 +86,6 @@ src/
     RideCard.tsx
     RideFeed.tsx
     SignOutButton.tsx
-    SignupForm.tsx
     StatusBadge.tsx
   lib/
     auth.ts                         # NextAuth options
@@ -97,7 +95,7 @@ src/
   models/
     Ride.ts
     User.ts
-middleware.ts                       # Protects /dashboard and /rides
+middleware.ts                       # Protects all routes except /login and NextAuth endpoints
 ```
 
 ## Notes

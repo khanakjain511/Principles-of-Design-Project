@@ -31,13 +31,6 @@ export default async function LoginPage() {
           <LoginForm />
         </Suspense>
 
-        <p className="mt-6 text-center text-sm text-ink-muted">
-          Don&rsquo;t have an account?{" "}
-          <Link href="/signup" className="font-medium text-ink underline-offset-4 hover:underline">
-            Create one
-          </Link>
-        </p>
-
         <p className="mt-10 text-center text-xs text-ink-subtle">
           Restricted to verified college email domains.
         </p>

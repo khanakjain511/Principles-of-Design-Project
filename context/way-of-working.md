@@ -20,7 +20,7 @@
 
 ## Authentication & Security
 - **NextAuth**: Use NextAuth for handling sessions.
-- **Middleware**: Use Next.js Middleware (`middleware.ts`) as private-by-default protection. Keep `/login`, `/signup`, and required NextAuth endpoints public; protect new pages and APIs unless they are explicitly auth-related.
+- **Middleware**: Use Next.js Middleware (`middleware.ts`) as private-by-default protection. Keep `/login` and required NextAuth endpoints public; protect new pages and APIs unless they are explicitly auth-related.
 - **Server-side Checks**: Always verify the user's session and permissions in Server Actions or Route Handlers before performing sensitive operations (e.g., only the creator can update or delete their ride).
 - **Passwords**: Never store plain text passwords. Always use `bcryptjs` for hashing and verification.
 

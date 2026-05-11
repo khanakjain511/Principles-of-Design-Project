@@ -6,10 +6,9 @@
 - [x] User schema and Mongoose integration for auth
 - [x] Email restriction (`@nst.rishihood.edu.in` and `@rishihood.edu.in`)
 - [x] Password hashing using `bcryptjs`
-- [x] Sign-up page (`/signup`)
 - [x] Sign-in page (`/login`)
 - [x] JWT session strategy implemented
-- [x] Private-by-default route protection via Next.js Middleware (`middleware.ts` protecting all app/API routes except `/login`, `/signup`, and `/api/auth/*`)
+- [x] Private-by-default route protection via Next.js Middleware (`middleware.ts` protecting all app/API routes except `/login` and `/api/auth/*`)
 
 ## Phase 2: Ride Board
 - [x] Ride schema creation (with denormalized creator snapshot)
@@ -35,7 +34,6 @@
 - [x] `auth.ts` — Auto-creates user in MongoDB on first Google sign-in (upsert)
 - [x] `auth.ts` — Bug fix: ensured token.id is mapped to MongoDB `_id` instead of Google ID
 - [x] `LoginForm.tsx` — Added "Sign in with Google" button with Google icon + divider
-- [x] `SignupForm.tsx` — Added "Sign up with Google" button with Google icon + divider
 - [x] Implementation plan saved in `context/google-auth-plan.md`
 - [x] **GCP Setup & Env Config** — Credentials added and successfully tested locally and in production.
 

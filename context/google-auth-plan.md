@@ -88,7 +88,7 @@ Finally, update the front-end to allow users to trigger the Google login flow.
 
 1. Install any necessary icons (e.g., using `lucide-react` or an SVG).
 2. Update **`src/app/login/page.tsx`** (or your Login Form component) to include a "Sign in with Google" button.
-3. Update **`src/app/signup/page.tsx`** to include a "Sign up with Google" button.
+3. Update the active auth UI to include a Google sign-in entry point.
 
 **Button Handler Example:**
 ```typescript

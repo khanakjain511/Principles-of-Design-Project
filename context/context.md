@@ -26,11 +26,11 @@ Students at Rishihood University / NST holding an email address with domains:
 
 ## Access Model
 - The app is private by default. Next.js Middleware protects all application and API routes unless explicitly excluded.
-- Public unauthenticated routes are `/login`, `/signup`, and the required NextAuth endpoints under `/api/auth/*` (including credential signup).
+- Public unauthenticated routes are `/login` and the required NextAuth endpoints under `/api/auth/*`.
 - Ride creation, status changes, deletion, and validation feedback use `react-hot-toast` notifications so the interaction pattern is consistent on mobile and desktop.
 
 ## Key Entities
-1. **User**: Represents a student. Requires university email for sign-up (via Google or Credentials).
+1. **User**: Represents a student. Access is restricted to approved university email domains.
 2. **Ride**: Represents a ride offering. Stores route information, departure time, capacity, WhatsApp contact number, and denormalized creator details for efficient querying.
 
 ## Development Setup
